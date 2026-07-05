@@ -9,7 +9,7 @@ The `styles/` folder is reserved for global styles, design tokens and style util
 
 ## Subfolders
 
-- `tokens/`: Design tokens once defined.
+- `tokens/`: Design tokens. Implemented as framework-neutral CSS custom properties in `tokens/tokens.css` (see `blueprints/design-system-foundation.md`).
 - `global/`: Global style entry points once a runtime exists.
 
 ## Rules

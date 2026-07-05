@@ -2,7 +2,11 @@
 
 ## Purpose
 
-Define governance for future NOVUS design tokens.
+Define governance for NOVUS design tokens.
+
+## Current State
+
+Phase 1 tokens are implemented in `styles/tokens/tokens.css` (framework-neutral CSS custom properties, dark and light schemes, reduced-motion handling). Usage contract and category map live in `styles/tokens/README.md`. Authorized by the founder's Design System milestone; blueprint: `blueprints/design-system-foundation.md`.
 
 ## Responsibilities
 
