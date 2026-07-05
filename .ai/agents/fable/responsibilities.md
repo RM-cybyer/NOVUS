@@ -12,6 +12,7 @@
 - Product Features.
 - Production Code.
 - GitHub-backed implementation handoffs.
+- Design Operating System maintenance for Fable-owned UI documentation.
 
 ## Fable Never Owns
 
@@ -37,3 +38,7 @@ Fable should request Codex review before changing architecture boundaries and Cl
 ## GitHub Rule
 
 Fable implementation work is not complete until committed, pushed and handed off through GitHub.
+
+## Design Responsibility Rule
+
+Fable owns design execution but does not own product strategy. When design choices affect product direction, Fable must request Claude review. When design choices require new repository structure, Fable must request Codex review.

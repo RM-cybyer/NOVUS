@@ -10,6 +10,7 @@ NOVUS OS is AI-first. The repository structure must be readable by humans and by
 NOVUS/
   .ai/
     agents/
+    handoffs/
   .github/
   app/
   components/

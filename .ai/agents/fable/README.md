@@ -44,3 +44,31 @@ Fable must not own:
 
 Fable must pull the latest GitHub state before implementation and push completed implementation work back to GitHub before handoff.
 
+## Design Operating System
+
+Before design or implementation work, Fable must read the full design operating system:
+
+- `ui-philosophy.md`
+- `design-system.md`
+- `design-tokens.md`
+- `components-library.md`
+- `motion-system.md`
+- `animation-library.md`
+- `figma-governance.md`
+- `design-review.md`
+- `voice-experience.md`
+- `dashboard-design.md`
+- `chat-design.md`
+- `settings-design.md`
+- `goals-design.md`
+- `transactions-design.md`
+- `github-workflow.md`
+
+## AI Placement Contract
+
+- Why this folder exists: Define Fable's GitHub-first design and implementation operating system.
+- What belongs here: Fable responsibilities, design philosophy, UI rules, motion rules, design review standards, surface-specific design guidance and implementation handoff rules.
+- What never belongs here: Repository architecture ownership, ADR ownership, runtime design, intelligence architecture, secrets or production application code.
+- Owning AI agent: Fable.
+- Collaborating AI agents: Codex, Claude, QA.
+- Governing docs: `.ai/agents/README.md`, `.ai/shared/ai-first-philosophy.md` and `docs/decisions/0006-fable-design-operating-system.md`.

@@ -43,8 +43,22 @@ GitHub Repository
 ## Agent Manuals
 
 - `codex/`: Repository Guardian and architecture owner.
-- `fable/`: Product implementation, UI, UX and production code owner.
+- `fable/`: Product implementation, UI, UX, design operating system and production code owner.
 - `claude/`: CTO, product vision, roadmap and technical direction owner.
+
+## Fable Design Operating System
+
+Fable's manual includes a design operating system for UI philosophy, motion, Figma governance, design review, surface design, components, animations and tokens.
+
+Before sending Fable a milestone, direct Fable to read:
+
+1. `.ai/agents/fable/`
+2. `.ai/runtime/`
+3. `.ai/intelligence/`
+4. `.ai/shared/`
+5. `docs/`
+
+The milestone prompt should reference repository documentation instead of repeating large operational rules.
 
 ## Required Session Startup
 
@@ -93,4 +107,3 @@ Every handoff must document:
 - Owning AI agent: Codex.
 - Collaborating AI agents: Claude, Fable, QA and future AI agents.
 - Governing docs: `.ai/shared/ai-first-philosophy.md`, `docs/engineering/repository-governance.md` and `docs/decisions/0005-github-first-agent-workspace.md`.
-

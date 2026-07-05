@@ -38,3 +38,12 @@ When implementation begins, design system docs should define:
 - Motion rules.
 - Usage examples.
 
+## Related Fable Docs
+
+- `design-tokens.md`
+- `components-library.md`
+- `motion-system.md`
+- `animation-library.md`
+- `ui-philosophy.md`
+- `design-review.md`
+

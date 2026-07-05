@@ -25,6 +25,7 @@ Every agent must read:
 ## Agent Folders
 
 - `.ai/agents/`: GitHub-first operational manuals for each AI agent.
+- `.ai/handoffs/`: Session handoffs that preserve GitHub-backed continuation context.
 - `.ai/shared/`: Rules and context shared by every agent.
 - `.ai/intelligence/`: Architecture for how NOVUS thinks, remembers, reasons and orchestrates AI providers.
 - `.ai/runtime/`: Architecture for how NOVUS executes workflows, events, tools, jobs and responses.

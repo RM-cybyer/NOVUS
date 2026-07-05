@@ -9,3 +9,4 @@ All notable repository foundation changes should be recorded here once the proje
 - Added the NOVUS Intelligence Layer architecture under `.ai/intelligence/`.
 - Added the NOVUS Runtime Operating System architecture under `.ai/runtime/`.
 - Added the GitHub-first AI Agent System under `.ai/agents/`.
+- Added the Fable Design Operating System and GitHub-backed handoff directory.

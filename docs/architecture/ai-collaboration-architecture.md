@@ -18,6 +18,7 @@ The repository should explain itself well enough that a future agent can:
 | --- | --- | --- |
 | `.ai/` | Codex | Claude, Fable, QA |
 | `.ai/agents/` | Codex | Claude, Fable, QA, future AI agents |
+| `.ai/handoffs/` | Codex | Claude, Fable, QA, future AI agents |
 | `.ai/intelligence/` | Codex | Claude, Fable, QA |
 | `.ai/runtime/` | Codex | Claude, Fable, QA |
 | `.github/` | Codex | QA, Fable |
