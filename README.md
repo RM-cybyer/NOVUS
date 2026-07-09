@@ -2,9 +2,19 @@
 
 NOVUS OS is the official repository for the AI Life, Business and Financial Operating System.
 
-This repository currently contains the engineering foundation only. It defines the repository architecture, documentation hierarchy, AI-agent operating model, governance process, templates and repository health workflow that future product work must follow.
+The repository contains the engineering foundation (architecture, documentation hierarchy, AI-agent operating model, governance, templates, repository health workflow) and the NOVUS application, implemented module by module on the official stack (ADR 0007: Next.js App Router, TypeScript, Tailwind CSS, pnpm).
 
-No product runtime, UI, API, business logic, framework or dependency has been introduced in this phase.
+## Run the App
+
+```bash
+pnpm install
+pnpm dev        # http://localhost:3000
+pnpm typecheck  # strict TypeScript gate
+pnpm lint       # ESLint gate
+pnpm build      # production build
+```
+
+Implemented so far: Module 1 Foundation (app shell, sidebar, topbar, responsive layout, command palette with global search, notifications panel, route scaffolding, loading/error/offline/empty states). See `blueprints/implementation-start.md`.
 
 NOVUS OS is AI-first. The repository is designed as an operating system for an AI software engineering team, with documentation treated as executable context for autonomous agents and human reviewers.
 
