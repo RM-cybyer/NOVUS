@@ -4,6 +4,8 @@ All notable repository foundation changes should be recorded here once the proje
 
 ## Unreleased
 
+- Module 02 Dashboard implemented (Mission Control): greeting with dynamic salute and daily focus, AI briefing card with decision items, priorities, financial overview (sparkline, budget, category anomaly), goals with risk prediction, business summary, memory insights, swipe-dismissable notifications and a quick-actions FAB with bottom sheet. Mobile-first, two-column desktop, lazy-loaded below-the-fold sections, typed data contracts with a documented backend seam (`lib/dashboard/`). Mobile nav expanded to 5 destinations and `/ajustes` scaffold added.
+
 - Initialized the NOVUS OS engineering foundation.
 - Added repository architecture, documentation hierarchy, AI-agent context, templates and repository health workflow.
 - Added the NOVUS Intelligence Layer architecture under `.ai/intelligence/`.
