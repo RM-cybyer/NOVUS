@@ -4,6 +4,8 @@ Design tokens for NOVUS. `tokens.css` is the single source of truth for every vi
 
 Status: Phase 1 implemented (framework-neutral CSS custom properties). See `blueprints/design-system-foundation.md`.
 
+Brand palette v2 (founder, 2026-07-09): `#020300` warm black, `#F7F4F3` warm white, `#FFA400` amber accent, `#772F1A` rust status family. Derived, contrast-validated values: `#D97B54` danger text on dark (6.8:1), `#A03E00` accent text on light (6.0:1). Amber is fill-first: as text it passes only on dark (10.4:1) - use `--color-accent-text` for accent-colored text so light mode stays accessible.
+
 ## Responsibility
 
 - Store color, typography, spacing, radius, elevation, blur, motion, opacity, z-index and sizing tokens.

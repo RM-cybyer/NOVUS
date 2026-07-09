@@ -112,7 +112,9 @@ function MobileNav() {
             className={cn(
               "flex h-11 items-center gap-2 rounded-full px-4 text-[12.5px] font-semibold",
               "transition-colors duration-(--duration-base)",
-              active ? "bg-white text-black" : "text-(--color-text-tertiary)",
+              active
+                ? "bg-(--color-text-primary) text-(--color-bg-base)"
+                : "text-(--color-text-tertiary)",
             )}
           >
             <Icon className="size-4" aria-hidden />
