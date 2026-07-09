@@ -41,6 +41,10 @@ Phase 3 (after component library exists):
 - Domain components (recommendation card, warning card, goal card, transaction row) per surface design docs.
 - Storybook or equivalent only after tooling ADRs exist.
 
+## Design Reference
+
+Design Milestone 01 (2026-07-08) produced the canonical Figma file `https://www.figma.com/design/Nbq4qAEvhtb1KDacWLYz2N`: Figma variables mirroring `styles/tokens/tokens.css`, 13 component sets plus 6 standalone components (states included), navigation screens (desktop expanded/collapsed, tablet, mobile), 9-step onboarding flow, app shell with command palette and notifications, and 16 documented motion patterns (catalog in `.ai/agents/fable/animation-library.md`). Figma is design input; this repository remains the source of truth.
+
 ## AI Ownership
 
 - Owning AI agent: Fable (styles/, future components/).
