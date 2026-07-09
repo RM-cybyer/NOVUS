@@ -11,7 +11,7 @@ GitHub is the source of truth. Figma can provide design input, but repository do
 ## Canonical Figma Files
 
 - NOVUS Design System: `https://www.figma.com/design/Nbq4qAEvhtb1KDacWLYz2N` (created 2026-07-08, Design Milestone 01). Contains tokens (Figma variables mirroring `styles/tokens/tokens.css`), the component library, navigation and layout screens, the onboarding flow and the motion boards.
-- Known Figma-plan limits recorded in the milestone handoff: single page (Starter), single variable mode (Light values live only in `tokens.css`), and brand fonts substituted (Space Grotesk for Clash Display, Inter for Satoshi) until Fontshare fonts are installed in Figma.
+- Known Figma-plan limits recorded in the milestone handoffs: single page (Starter), single variable mode (Light values live only in `tokens.css`), brand fonts substituted (Space Grotesk for Clash Display, Inter for Satoshi) until Fontshare fonts are installed in Figma, and an MCP tool-call cap on the Starter plan that can interrupt long design sessions (hit during Milestone 02; plan repair/export passes accordingly or upgrade the plan).
 
 ## Responsibilities
 

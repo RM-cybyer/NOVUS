@@ -13,3 +13,4 @@ All notable repository foundation changes should be recorded here once the proje
 - Added the official runtime and technology architecture under `docs/architecture/runtime/`.
 - Added the Design System Foundation blueprint and Phase 1 design tokens in `styles/tokens/` (framework-neutral CSS custom properties, dark and light schemes).
 - Completed Design Milestone 01: canonical Figma design system (tokens, 13 component sets, navigation, onboarding, global layout) and the approved motion pattern catalog in `.ai/agents/fable/animation-library.md`.
+- Design Milestone 02 (built, pending visual repair pass): 13 product screens in Figma (Chat, Voice, Dashboard desktop/mobile, Metas, Movimientos, Ajustes, Memoria, Conexiones, Grafo de Conocimiento, Negocio, Notificaciones, state screens) plus interactive prototype flows; QA findings and repair procedure recorded in the milestone handoff.
