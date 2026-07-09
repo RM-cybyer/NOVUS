@@ -29,4 +29,4 @@ Engineering work should prioritize:
 
 ## Dependency Rule
 
-No dependency should be added until the repository has a runtime decision, package manager decision and documented rationale for that dependency.
+No dependency should be added unless it belongs to the official runtime stack in `docs/architecture/runtime/` or has an approved ADR with documented rationale.

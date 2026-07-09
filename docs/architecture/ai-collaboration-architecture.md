@@ -22,6 +22,7 @@ The repository should explain itself well enough that a future agent can:
 | `.ai/intelligence/` | Codex | Claude, Fable, QA |
 | `.ai/runtime/` | Codex | Claude, Fable, QA |
 | `.github/` | Codex | QA, Fable |
+| `docs/architecture/runtime/` | Codex | Fable, Claude, QA |
 | `app/` | Fable | Codex, QA, Claude |
 | `components/` | Fable | Codex, QA |
 | `lib/` | Codex | Fable, QA |

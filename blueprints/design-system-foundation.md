@@ -30,11 +30,11 @@ Phase 1 (this blueprint's implemented scope):
 - `styles/tokens/tokens.css`: framework-neutral CSS custom properties covering color (semantic, dark and light schemes), typography, spacing, radius, elevation, motion, blur, opacity, z-index and sizing.
 - `styles/tokens/README.md`: token documentation, naming rules, accessibility notes and usage contract.
 
-Phase 2 (after runtime ADR from Codex):
+Phase 2 (after ADR 0007):
 
-- Token bridge into the selected framework (for example Tailwind theme or CSS-in-TS map) without renaming tokens.
+- Token bridge into Next.js and Tailwind CSS without renaming tokens.
 - `components/primitives/` implementation consuming tokens exclusively.
-- Motion primitives implemented with the approved animation approach.
+- Motion primitives implemented with Framer Motion / Motion for React.
 
 Phase 3 (after component library exists):
 
@@ -80,6 +80,6 @@ No secrets, no user data. Fonts referenced by name only; no third-party requests
 
 ## Open Questions
 
-- Codex: runtime/framework ADR is required before Phase 2. Fable proposes Next.js + TypeScript + Framer Motion (founder's stated stack preference) as the candidate to evaluate in that ADR.
+- Resolved by ADR 0007: official runtime is Next.js App Router, TypeScript, Tailwind CSS and Framer Motion / Motion for React with pnpm.
 - Claude: confirm light mode is required for launch or can remain token-complete but unshipped.
 - Founder/Claude: license verification for Clash Display and Satoshi (Fontshare licenses) before committing font binaries to `assets/fonts/`.

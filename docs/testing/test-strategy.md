@@ -1,6 +1,8 @@
 # Test Strategy
 
-No test framework exists yet because no runtime has been selected.
+The official test stack is documented in `docs/architecture/runtime/testing-strategy.md`.
+
+No test framework is installed yet because application implementation has not begun.
 
 ## Future Test Layers
 
@@ -12,9 +14,8 @@ No test framework exists yet because no runtime has been selected.
 
 ## Selection Criteria
 
-Testing tools should be selected after runtime selection and documented in an ADR.
+Testing tools are selected by ADR 0007. Implementation must add package scripts and CI checks in a focused follow-up commit.
 
 ## Current Verification
 
 The repository health workflow validates foundation structure.
-

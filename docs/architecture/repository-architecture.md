@@ -53,6 +53,12 @@ NOVUS/
 | `docs/` | Engineering documentation, architecture notes and runbooks. |
 | `blueprints/` | Design and implementation blueprints for large features or architectural changes. |
 
+## Architecture Subsections
+
+| Path | Responsibility |
+| --- | --- |
+| `docs/architecture/runtime/` | Official runtime framework, technology stack, provider-neutral AI architecture, deployment, testing and security decisions. |
+
 ## Documentation Requirement
 
 Every folder must include a README explaining:

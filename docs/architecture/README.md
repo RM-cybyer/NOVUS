@@ -14,3 +14,4 @@ This folder contains repository and system architecture documentation.
 - `ai-collaboration-architecture.md`: AI ownership and collaboration model.
 - `module-boundaries.md`: Module ownership and allowed dependencies.
 - `dependency-boundaries.md`: Dependency introduction and isolation policy.
+- `runtime/`: Official runtime and technology architecture.

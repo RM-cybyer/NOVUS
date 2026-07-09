@@ -26,6 +26,7 @@ NOVUS OS is AI-first. The repository is designed as an operating system for an A
 - Runtime Operating System: `.ai/runtime/README.md`
 - AI collaboration architecture: `docs/architecture/ai-collaboration-architecture.md`
 - Repository architecture: `docs/architecture/repository-architecture.md`
+- Runtime technology architecture: `docs/architecture/runtime/README.md`
 - Engineering standards: `docs/engineering/README.md`
 - Contribution guide: `CONTRIBUTING.md`
 - Security baseline: `SECURITY.md`
@@ -33,7 +34,9 @@ NOVUS OS is AI-first. The repository is designed as an operating system for an A
 
 ## Development Status
 
-No application runtime has been selected in this checkout yet. Until a framework and package manager are introduced, there are no install, build or test commands to run.
+The official runtime stack is selected in `docs/architecture/runtime/`, but no framework files, package manifest, lockfile, dependencies or application code have been introduced yet.
+
+Until package metadata is added, there are no install, build or test commands to run.
 
 The only automated workflow in this phase is a repository health check that validates documentation and folder structure.
 

@@ -11,6 +11,7 @@ The `docs/` folder is the engineering knowledge base for NOVUS OS.
 ## Hierarchy
 
 - `architecture/`: Repository and system architecture.
+- `architecture/runtime/`: Official runtime framework and technology architecture.
 - `decisions/`: Architecture decision records.
 - `engineering/`: Engineering standards and governance.
 - `security/`: Security baseline and security-sensitive process.

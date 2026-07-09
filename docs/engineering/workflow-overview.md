@@ -50,4 +50,4 @@ GitHub Repository
 
 ## Current Limitation
 
-No runtime-specific workflow exists yet because no runtime has been selected.
+The official runtime stack is selected, but no framework files, package scripts or application implementation exist yet.

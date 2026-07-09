@@ -13,10 +13,13 @@ Use numbered kebab-case filenames:
 
 ```text
 0001-repository-operating-system.md
-0002-select-application-runtime.md
+0007-official-runtime-framework.md
 ```
+
+## Current Runtime Decision
+
+ADR 0007 defines the official NOVUS runtime framework, technology stack, provider-neutral AI layer, package manager, testing strategy and deployment target.
 
 ## Template
 
 Use `docs/templates/adr-template.md`.
-
