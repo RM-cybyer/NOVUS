@@ -8,6 +8,11 @@ Define how Figma design work should interact with the GitHub-first NOVUS reposit
 
 GitHub is the source of truth. Figma can provide design input, but repository documentation and committed implementation are authoritative for engineering work.
 
+## Canonical Figma Files
+
+- NOVUS Design System: `https://www.figma.com/design/Nbq4qAEvhtb1KDacWLYz2N` (created 2026-07-08, Design Milestone 01). Contains tokens (Figma variables mirroring `styles/tokens/tokens.css`), the component library, navigation and layout screens, the onboarding flow and the motion boards.
+- Known Figma-plan limits recorded in the milestone handoff: single page (Starter), single variable mode (Light values live only in `tokens.css`), and brand fonts substituted (Space Grotesk for Clash Display, Inter for Satoshi) until Fontshare fonts are installed in Figma.
+
 ## Responsibilities
 
 - Track which Figma files or frames inform implementation.
