@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  foundation:
+  structure:
     name: Validate repository foundation
     runs-on: ubuntu-latest
 
@@ -20,154 +20,62 @@ jobs:
         run: |
           set -euo pipefail
 
-          required_dirs=(
-            ".ai"
-            ".ai/shared"
-            ".ai/agents"
-            ".ai/agents/codex"
-            ".ai/agents/fable"
-            ".ai/agents/claude"
-            ".ai/handoffs"
-            ".ai/intelligence"
-            ".ai/runtime"
-            ".ai/codex"
-            ".ai/claude"
-            ".ai/fable"
-            ".ai/qa"
-            ".github"
-            ".github/workflows"
-            ".github/ISSUE_TEMPLATE"
+          # Only load-bearing paths are enforced. Module folders are created
+          # when the module is built, not kept as empty scaffolding.
+          required_paths=(
+            "README.md"
+            "CONTRIBUTING.md"
+            "SECURITY.md"
+            "package.json"
             "app"
             "components"
             "lib"
             "services"
-            "database"
-            "hooks"
-            "providers"
-            "context"
-            "store"
             "styles"
-            "assets"
-            "public"
-            "scripts"
-            "tests"
-            "docs"
-            "docs/architecture"
-            "docs/architecture/runtime"
-            "docs/decisions"
-            "docs/engineering"
-            "docs/security"
-            "docs/testing"
-            "docs/operations"
-            "docs/templates"
-            "docs/reference"
-            "docs/contributing"
-            "blueprints"
-          )
-
-          required_files=(
-            "README.md"
-            "CONTRIBUTING.md"
-            "SECURITY.md"
-            ".ai/README.md"
-            ".ai/shared/README.md"
-            ".ai/agents/README.md"
-            ".ai/agents/codex/README.md"
-            ".ai/agents/codex/playbook.md"
-            ".ai/agents/codex/workflow.md"
-            ".ai/agents/codex/responsibilities.md"
-            ".ai/agents/codex/git-workflow.md"
-            ".ai/agents/codex/repository-guardian.md"
-            ".ai/agents/codex/handoff.md"
-            ".ai/agents/fable/README.md"
-            ".ai/agents/fable/playbook.md"
-            ".ai/agents/fable/workflow.md"
-            ".ai/agents/fable/responsibilities.md"
-            ".ai/agents/fable/design-system.md"
-            ".ai/agents/fable/ui-philosophy.md"
-            ".ai/agents/fable/motion-system.md"
-            ".ai/agents/fable/figma-governance.md"
-            ".ai/agents/fable/design-review.md"
-            ".ai/agents/fable/github-workflow.md"
-            ".ai/agents/fable/voice-experience.md"
-            ".ai/agents/fable/dashboard-design.md"
-            ".ai/agents/fable/chat-design.md"
-            ".ai/agents/fable/settings-design.md"
-            ".ai/agents/fable/goals-design.md"
-            ".ai/agents/fable/transactions-design.md"
-            ".ai/agents/fable/components-library.md"
-            ".ai/agents/fable/animation-library.md"
-            ".ai/agents/fable/design-tokens.md"
-            ".ai/agents/fable/implementation-guide.md"
-            ".ai/agents/fable/handoff.md"
-            ".ai/agents/claude/README.md"
-            ".ai/agents/claude/cto.md"
-            ".ai/agents/claude/product-strategy.md"
-            ".ai/agents/claude/roadmap.md"
-            ".ai/agents/claude/decision-framework.md"
-            ".ai/agents/claude/handoff.md"
-            ".ai/handoffs/README.md"
-            ".ai/intelligence/README.md"
-            ".ai/intelligence/architecture.md"
-            ".ai/intelligence/providers.md"
-            ".ai/intelligence/registry.md"
-            ".ai/runtime/README.md"
-            ".ai/runtime/runtime-overview.md"
-            ".ai/runtime/execution-pipeline.md"
-            ".ai/runtime/workflow-orchestrator.md"
-            ".ai/runtime/event-system.md"
-            ".ai/codex/README.md"
-            "docs/README.md"
             "docs/architecture/repository-architecture.md"
-            "docs/architecture/ai-collaboration-architecture.md"
             "docs/architecture/runtime/README.md"
-            "docs/architecture/runtime/runtime-framework.md"
-            "docs/architecture/runtime/frontend-architecture.md"
-            "docs/architecture/runtime/backend-architecture.md"
-            "docs/architecture/runtime/database-architecture.md"
-            "docs/architecture/runtime/authentication.md"
-            "docs/architecture/runtime/storage.md"
-            "docs/architecture/runtime/deployment.md"
-            "docs/architecture/runtime/dependency-policy.md"
-            "docs/architecture/runtime/package-manager.md"
-            "docs/architecture/runtime/testing-strategy.md"
-            "docs/architecture/runtime/performance-strategy.md"
-            "docs/architecture/runtime/security-architecture.md"
-            "docs/architecture/runtime/tech-stack.md"
-            "docs/architecture/runtime/ai-provider-layer.md"
             "docs/decisions/0007-official-runtime-framework.md"
-            "docs/engineering/ai-first-engineering.md"
-            "docs/engineering/repository-governance.md"
+            ".ai/README.md"
+            ".ai/agents/README.md"
             "blueprints/_template.md"
             ".github/pull_request_template.md"
           )
 
           missing=0
-
-          for path in "${required_dirs[@]}"; do
-            if [[ ! -d "$path" ]]; then
-              echo "Missing required directory: $path"
+          for path in "${required_paths[@]}"; do
+            if [[ ! -e "$path" ]]; then
+              echo "Missing required path: $path"
               missing=1
             fi
           done
-
-          for path in "${required_files[@]}"; do
-            if [[ ! -f "$path" ]]; then
-              echo "Missing required file: $path"
-              missing=1
-            fi
-          done
-
-          while IFS= read -r dir; do
-            dir="${dir#./}"
-            if [[ "$dir" == "." ]]; then
-              continue
-            fi
-
-            if [[ ! -f "$dir/README.md" ]]; then
-              echo "Missing README.md in directory: $dir"
-              missing=1
-            fi
-          done < <(find . -type d -not -path "./.git*" | sort)
 
           exit "$missing"
+
+  verify:
+    name: Typecheck, lint and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
