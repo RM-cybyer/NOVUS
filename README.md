@@ -44,11 +44,20 @@ NOVUS OS is AI-first. The repository is designed as an operating system for an A
 
 ## Development Status
 
-The official runtime stack is selected in `docs/architecture/runtime/`, but no framework files, package manifest, lockfile, dependencies or application code have been introduced yet.
+Built and working:
 
-Until package metadata is added, there are no install, build or test commands to run.
+- **Foundation** — app shell, sidebar, topbar, responsive layout, command palette with global search, notifications panel, loading/error/offline/empty states, motion system and design tokens.
+- **Dashboard** — Mission Control at `/panel` with briefing, priorities, agenda, finance, goals, business, memory and notifications.
 
-The only automated workflow in this phase is a repository health check that validates documentation and folder structure.
+Built but not functional:
+
+- **Chat** at `/chat` and the **AI Provider Layer** in `services/ai/` (registry, routing, NIM adapter, streaming). The layer has never served a live request: `AIService` is constructed in the browser and receives no API key, so calls are unauthenticated. A server route is required.
+
+Not built: persistence (`database/` is empty), authentication, and tests. Six routes (`/memoria`, `/movimientos`, `/metas`, `/negocio`, `/ajustes`, `/conexiones`) are scaffolds showing an empty state. All dashboard data comes from `lib/dashboard/demo-data.ts`.
+
+CI runs the repository structure check plus typecheck, lint and build on every push and pull request.
+
+See `PROJECT_STATUS.md` for the current assessment and the MVP critical path.
 
 ## GitHub-First Collaboration
 

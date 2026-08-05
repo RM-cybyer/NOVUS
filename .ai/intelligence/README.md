@@ -1,100 +1,49 @@
 # Intelligence Layer
 
-The Intelligence Layer is the architectural brain of NOVUS OS.
+Documentation for the AI layer that NOVUS actually runs.
 
-NOVUS is not an AI wrapper. NOVUS owns the reasoning process, memory model, decision workflow and recommendation philosophy. External AI models are reasoning engines that NOVUS orchestrates through documented provider boundaries.
+NOVUS is not an AI wrapper. It owns the reasoning process and calls
+external models through a documented provider boundary, so no product
+code depends on NVIDIA, OpenAI, Anthropic or any other vendor directly.
 
-## Purpose
+## Scope
 
-Define how NOVUS thinks, remembers, reasons, plans, recommends and evaluates decisions across life, business and financial contexts.
+This folder documents implemented behaviour only. Design notes for
+capabilities that do not exist yet belong in a blueprint under
+`blueprints/`. A document that describes a system which was never built
+reads to both agents and humans as if it were real, and that is how the
+repository ended up with more specification than code.
 
-## Responsibilities
+## Document map
 
-- Define the AI operating layer before implementation.
-- Describe the provider abstraction and model registry.
-- Document memory, knowledge graph, context, reasoning and decision workflows.
-- Preserve AI-readable architecture for future autonomous agents.
-- Prevent direct product coupling to any single model provider.
+| Document | Implemented by |
+|---|---|
+| `registry.md` | `services/ai/registry.ts` |
+| `providers.md` | `services/ai/providers/` |
+| `models.md` | the model records in `services/ai/registry.ts` |
 
-## Inputs
+## Current state
 
-- User messages and explicit user goals.
-- User profile and preferences.
-- Short-term and long-term memory.
-- Knowledge graph entities and relationships.
-- Documents, tasks, projects, financial records and business context once implemented.
-- Tool results and external service outputs once approved.
+The layer provides a provider-neutral request contract, a model registry
+carrying capability and sensitivity metadata, a routing engine, normalized
+provider errors and a NVIDIA NIM adapter with SSE streaming.
 
-## Outputs
+It has never served a live request. `AIService` is currently constructed
+in the browser by the chat view and no API key reaches it, so any call
+would be unauthenticated. Moving execution to a server route is the first
+task of the MVP work.
 
-- Context packets for reasoning.
-- Prompt plans for provider execution.
-- Decision records and recommendation candidates.
-- Memory updates.
-- Knowledge graph updates.
-- Evaluated user-facing responses.
+## Not built
 
-## Interactions with Other Modules
+Memory, knowledge graph, embeddings, tool calling, planning, decision and
+recommendation engines are product goals, not code. They are tracked in
+the roadmap and specified in a blueprint when the work starts.
 
-- `.ai/shared/`: Shared AI operating principles.
-- `.ai/codex/`: Repository Guardian review and architecture enforcement.
-- `services/ai/`: Future implementation boundary for provider adapters.
-- `lib/`: Future shared utilities for validation, configuration, logging and evaluation.
-- `database/`: Future persistence for memories, graph entities and decisions.
-- `docs/security/`: Security and privacy governance.
+## AI placement contract
 
-## Future Scalability
-
-The Intelligence Layer should support:
-
-- Multiple providers.
-- Multiple model categories.
-- Model fallback chains.
-- User-specific memory evolution.
-- Multi-step workflows.
-- Domain-specific reasoning engines.
-- Auditable decision and recommendation trails.
-
-## AI Ownership
-
-- Owning AI agent: Codex.
-- Collaborating AI agents: Claude for strategic product direction, Fable for future implementation, QA for validation and safety checks.
-
-## Engineering Considerations
-
-- No direct dependency on OpenAI, Anthropic, NVIDIA, Google, OpenRouter, xAI or any future provider.
-- Provider communication must go through the AI Provider Layer.
-- No business logic is implemented in this phase.
-- Documentation is executable context for future AI agents.
-- Every future implementation module must map back to one of these architecture documents.
-
-## Document Map
-
-- `architecture.md`: System architecture and boundaries.
-- `providers.md`: AI Provider Layer abstraction.
-- `models.md`: Model categories and model capabilities.
-- `registry.md`: AI Registry design.
-- `workflow-engine.md`: Workflow orchestration.
-- `context-builder.md`: Context assembly.
-- `reasoning-engine.md`: Reasoning process.
-- `decision-engine.md`: Decision logic architecture.
-- `memory-engine.md`: Memory architecture.
-- `knowledge-graph.md`: Entity and relationship model.
-- `recommendation-engine.md`: Recommendation philosophy.
-- `planning-engine.md`: Plans, goals and execution paths.
-- `tool-calling.md`: Tool boundary and tool governance.
-- `prompt-engine.md`: Prompt construction and governance.
-- `embeddings.md`: Embedding architecture.
-- `conversation-lifecycle.md`: End-to-end conversation flow.
-- `security.md`: AI safety, privacy and data protection.
-- `future-roadmap.md`: Phased evolution.
-
-## AI Placement Contract
-
-- Why this folder exists: Define the AI operating layer that future agents and engineers must follow before implementing intelligence features.
-- What belongs here: Architecture, responsibilities, workflows, safety rules and future implementation contracts for NOVUS intelligence.
-- What never belongs here: Provider SDK code, application code, UI, API handlers, secrets, prompts containing real user data or business logic implementation.
-- Owning AI agent: Codex.
-- Collaborating AI agents: Claude, Fable, QA.
-- Governing docs: `.ai/shared/ai-first-philosophy.md`, `docs/architecture/ai-collaboration-architecture.md` and `docs/decisions/0003-intelligence-layer-architecture.md`.
-
+- What belongs here: documentation of the intelligence code that exists.
+- What never belongs here: provider SDK code, application code, UI, API
+  handlers, secrets, or specifications for unbuilt systems.
+- Owning AI agent: Codex. Collaborating: Claude, Fable.
+- Governing docs: `.ai/shared/ai-first-philosophy.md`,
+  `docs/decisions/0003-intelligence-layer-architecture.md`.
