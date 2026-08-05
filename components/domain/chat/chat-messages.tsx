@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import type { ChatMessage, ChatRole } from "@/lib/chat/types";
 import { MarkdownMessage, MessageMeta } from "./markdown-message";
@@ -48,7 +48,7 @@ export function ChatMessageBubble({ message, isStreaming, reduce }: ChatMessageB
             : "bg-(--color-surface) border border-(--color-border) text-(--color-text-secondary) rounded-bl-sm",
         )}
       >
-        <MarkdownMessage message={message} isStreaming={isStreaming} />
+        <MarkdownMessage message={message} />
 
         {!isStreaming && (
           <>

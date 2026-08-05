@@ -1,10 +1,10 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage } from "@/lib/chat/types";
 
-const renderers: Record<string, React.ComponentType<any>> = {
+const renderers: Components = {
   p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
   strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
   em: ({ children }) => <em className="italic">{children}</em>,
@@ -26,7 +26,7 @@ const renderers: Record<string, React.ComponentType<any>> = {
   ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-2">{children}</ul>,
   ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-2">{children}</ol>,
   li: ({ children }) => <li>{children}</li>,
-  a: ({ href, children, ...props }: { href: string; children: React.ReactNode; [key: string]: any }) => (
+  a: ({ href, children, ...props }) => (
     <a
       href={href}
       target="_blank"
@@ -44,10 +44,9 @@ const renderers: Record<string, React.ComponentType<any>> = {
 
 interface MarkdownMessageProps {
   message: ChatMessage;
-  isStreaming?: boolean;
 }
 
-export function MarkdownMessage({ message, isStreaming }: MarkdownMessageProps) {
+export function MarkdownMessage({ message }: MarkdownMessageProps) {
   const isUser = message.role === "user";
 
   if (isUser) {

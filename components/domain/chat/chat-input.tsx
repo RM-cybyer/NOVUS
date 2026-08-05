@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, KeyboardEvent } from "react";
-import { Mic, Paperclip, Send, Sparkles } from "lucide-react";
+import { Mic, Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/primitives/button";
-import { cn } from "@/lib/utils/cn";
 
 interface ChatInputProps {
   onSend: (text: string, attachments?: File[]) => void;

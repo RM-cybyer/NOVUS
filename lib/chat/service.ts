@@ -47,11 +47,11 @@ export class ChatService {
       timestamp: Date.now(),
     };
     session.messages.push(userMessage);
+    session.messageCount += 1;
     session.updatedAt = Date.now();
 
-    // Build model request from conversation history
-    const modelRequest = this.buildModelRequest(session, request.content);
-    const decision = this.ai.route(modelRequest);
+    // Build model request from conversation history (user message included).
+    const modelRequest = this.buildModelRequest(session);
 
     let fullContent = "";
     const assistantMessageId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -73,6 +73,7 @@ export class ChatService {
             content: fullContent,
             timestamp: Date.now(),
             metadata: {
+              alias: chunk.metadata.alias,
               providerId: chunk.metadata.providerId,
               latencyMs: chunk.metadata.latencyMs ?? 0,
               tokens: chunk.metadata.tokens
@@ -85,8 +86,8 @@ export class ChatService {
               costUsd: chunk.metadata.costUsd,
             },
           };
-          session.messages.push(userMessage, assistantMessage);
-          session.messageCount += 2;
+          session.messages.push(assistantMessage);
+          session.messageCount += 1;
           session.updatedAt = Date.now();
 
           yield {
@@ -103,23 +104,23 @@ export class ChatService {
   }
 
   /** Build a provider-neutral request from chat history and context. */
-  private buildModelRequest(session: ChatSession, latestUserContent: string): ModelRequest {
+  private buildModelRequest(session: ChatSession): ModelRequest {
     const systemPrompt = this.buildSystemPrompt(session.context);
     const messages = session.messages.map((m) => ({
       role: m.role as "system" | "user" | "assistant" | "tool",
       content: m.content,
     }));
 
-return {
-        alias: "nova-reasoning",
-        messages,
-        systemPrompt,
-        temperature: 0.3,
-        maxTokens: 2048,
-        sensitivity: "internal",
-        workflowType: "chat",
-        stream: true,
-      };
+    return {
+      modelAlias: "nova-reasoning",
+      messages,
+      systemPrompt,
+      temperature: 0.3,
+      maxTokens: 2048,
+      sensitivity: "internal",
+      workflowType: "chat",
+      stream: true,
+    };
   }
 
   /** Build system prompt injecting user context. */

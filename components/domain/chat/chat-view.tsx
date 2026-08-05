@@ -2,12 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Sparkles,
-  Loader2,
-  AlertTriangle,
-  ArrowUpRight,
-} from "lucide-react";
+import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
 import type { ChatMessage, DecisionCard, SuggestedAction } from "@/lib/chat/types";
 import type { ModelRequest } from "@/services/ai/types";
 import { loadAIConfig, buildProviderConfig } from "@/lib/ai/config";
@@ -15,8 +10,6 @@ import { AIService } from "@/services/ai";
 import { ChatMessageBubble } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 import { ScrollArea } from "@/components/primitives/scroll-area";
-import { Badge } from "@/components/primitives/badge";
-import { cn } from "@/lib/utils/cn";
 
 const WELCOME_MESSAGES = [
   "Hola. En qué te ayudo hoy?",
@@ -64,48 +57,7 @@ function TypingIndicator({ reduce }: { reduce: boolean }) {
   );
 }
 
-function DecisionCard({ card, reduce }: { card: DecisionCard; reduce: boolean }) {
-  const kindMeta: Record<DecisionCard["kind"], { label: string; icon: string }> = {
-    finance: { label: "Finanzas", icon: "💰" },
-    goal: { label: "Meta", icon: "🎯" },
-    calendar: { label: "Agenda", icon: "📅" },
-    business: { label: "Negocio", icon: "🏢" },
-    memory: { label: "Memoria", icon: "🧠" },
-    info: { label: "Info", icon: "ℹ️" },
-  };
-  const meta = kindMeta[card.kind];
-
-  return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.1 }}
-      className="group flex gap-3 rounded-(--radius-xl) border border-(--color-border) bg-(--color-surface) p-4 transition-colors hover:border-(--color-border-strong)"
-    >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-(--radius-lg) bg-(--color-surface-raised) text-[18px]" aria-hidden>
-        {meta.icon}
-      </span>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <Badge kind={card.priority === "high" ? "danger" : card.priority === "medium" ? "accent" : "neutral"}>
-            {meta.label}
-          </Badge>
-          <h4 className="font-semibold text-(--color-text-primary)">{card.title}</h4>
-        </div>
-        <p className="mt-1 text-[13px] leading-snug text-(--color-text-secondary) line-clamp-2">{card.description}</p>
-        <a
-          href={card.actionHref}
-          className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-(--color-accent) hover:text-(--color-accent-text) transition-colors"
-        >
-          {card.actionLabel}
-          <ArrowUpRight className="size-3.5" aria-hidden />
-        </a>
-      </div>
-    </motion.div>
-  );
-}
-
-function SuggestedActionsList({ actions, onSelect, reduce }: { actions: SuggestedAction[]; onSelect: (prompt: string) => void; reduce: boolean }) {
+function SuggestedActionsList({ actions, onSelect }: { actions: SuggestedAction[]; onSelect: (prompt: string) => void }) {
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[11px] font-semibold uppercase tracking-(--letter-spacing-caps) text-(--color-text-tertiary)">
@@ -152,7 +104,7 @@ export function ChatView() {
   }, [messages, isStreaming, reduce]);
 
   const handleSend = useCallback(
-    async (text: string, _attachments?: File[]) => {
+    async (text: string) => {
       if (!aiService.current) return;
 
       const userMessage: ChatMessage = {
@@ -255,14 +207,12 @@ export function ChatView() {
         }
 
         if (fullContent.includes("DECISION_CARD:")) {
-          const cards = parseDecisionCards(fullContent);
-          decisionCards = cards;
+          decisionCards = parseTaggedBlocks<DecisionCard>(fullContent, "DECISION_CARD");
           fullContent = fullContent.replace(/DECISION_CARD:.*?---/gs, "");
         }
 
         if (fullContent.includes("SUGGESTED_ACTION:")) {
-          const actions = parseSuggestedActions(fullContent);
-          suggestedActions = actions;
+          suggestedActions = parseTaggedBlocks<SuggestedAction>(fullContent, "SUGGESTED_ACTION");
           fullContent = fullContent.replace(/SUGGESTED_ACTION:.*?---/gs, "");
         }
 
@@ -388,32 +338,20 @@ export function ChatView() {
                     recordar lo importante y ayudarte a tomar mejores decisiones.
                   </p>
                 </div>
-                <SuggestedActionsList actions={SUGGESTED_PROMPTS} onSelect={handleSuggestion} reduce={reduce} />
+                <SuggestedActionsList actions={SUGGESTED_PROMPTS} onSelect={handleSuggestion} />
               </motion.div>
             )}
           </AnimatePresence>
 
+          {/* Decision cards and suggested actions render inside their own bubble. */}
           {messages.map((message) => (
             <ChatMessageBubble
               key={message.id}
               message={message}
               isStreaming={isStreaming && message.id === messages[messages.length - 1]?.id && message.role === "assistant"}
-              reduce={reduceMotion}
+              reduce={reduce}
             />
           ))}
-
-          {messages.length > 0 && messages[messages.length - 1]?.decisionCards && messages[messages.length - 1].decisionCards.length > 0 && (
-            <DecisionCards cards={messages[messages.length - 1].decisionCards!} reduce={reduce} 
-            />
-          )}
-
-          {messages.length > 0 && messages[messages.length - 1]?.suggestedActions && messages[messages.length - 1].suggestedActions.length > 0 && (
-<SuggestedActionsList
-            actions={messages[messages.length - 1].suggestedActions!}
-            onSelect={handleSuggestion}
-            reduce={reduce}
-          />
-          )}
 
           {isStreaming && <TypingIndicator reduce={reduce} />}
 
@@ -444,47 +382,19 @@ export function ChatView() {
   );
 }
 
-function DecisionCards({ cards, reduce }: { cards: DecisionCard[]; reduce: boolean }) {
-  if (!cards.length) return null;
-  return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col gap-3 mt-3"
-    >
-      {cards.map((card) => (
-        <DecisionCard key={card.id} card={card} reduce={reduce} />
-      ))}
-    </motion.div>
-  );
-}
-
-function parseDecisionCards(content: string): DecisionCard[] {
-  const cards: DecisionCard[] = [];
-  const regex = /DECISION_CARD:\s*({[\s\S]*?})\s*---/g;
-  let match;
+/** Parse the inline `MARKER: {json} ---` blocks the model emits. */
+function parseTaggedBlocks<T>(content: string, marker: string): T[] {
+  const parsed: T[] = [];
+  const regex = new RegExp(`${marker}:\\s*({[\\s\\S]*?})\\s*---`, "g");
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(content)) !== null) {
+    const raw = match[1];
+    if (!raw) continue;
     try {
-      const card = JSON.parse(match[1]);
-      cards.push(card);
+      parsed.push(JSON.parse(raw) as T);
     } catch {
-      // ignore malformed
+      // ignore malformed block
     }
   }
-  return cards;
-}
-
-function parseSuggestedActions(content: string): SuggestedAction[] {
-  const actions: SuggestedAction[] = [];
-  const regex = /SUGGESTED_ACTION:\s*({[\s\S]*?})\s*---/g;
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    try {
-      const action = JSON.parse(match[1]);
-      actions.push(action);
-    } catch {
-      // ignore malformed
-    }
-  }
-  return actions;
+  return parsed;
 }
