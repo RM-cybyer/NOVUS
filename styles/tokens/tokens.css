@@ -4,152 +4,150 @@
    Framework-neutral CSS custom properties. Single source of
    truth for every visual decision in NOVUS.
 
-   Governance: .ai/agents/fable/design-tokens.md
-   Blueprint:  blueprints/design-system-foundation.md
-   Owner: Fable. Collaborators: Codex, QA, Claude.
+   Brand palette v2 (founder): #020300 warm black, #F7F4F3 warm
+   white, #FFA400 amber, #772F1A rust.
+   Visual direction v3 (founder, 2026-07-09): amber-to-white
+   gradient background with iOS-style liquid-glass cards.
+   DEFAULT scheme is the light glass theme; the dark theme is
+   preserved under [data-theme="dark"].
 
-   Rules:
-   - Consume tokens; never hard-code raw values in UI code.
-   - Tokens are named by purpose, not by appearance.
-   - Dark is the default scheme. Light overrides via
-     [data-theme="light"] or prefers-color-scheme.
+   Governance: .ai/agents/fable/design-tokens.md
+   Owner: Fable. Collaborators: QA, founder.
    ============================================================ */
 
 :root {
-  /* -- Color: backgrounds (dark default) ---------------------
-     Brand palette v2 (founder, 2026-07-09): #020300 warm black,
-     #F7F4F3 warm white, #FFA400 amber, #772F1A rust.
-     Base gradient stops for app background: base -> warm -> deep. */
-  --color-bg-base: #020300;
-  --color-bg-warm: #0A0805;
-  --color-bg-deep: #14100A;
+  /* -- Color: background gradient (amber -> white) -----------
+     Ink text works across the whole gradient: #020300 measures
+     10.4:1 on #FFA400 and 18.9:1 on #F7F4F3. */
+  --color-bg-base: #FFA400;   /* gradient start (amber side) */
+  --color-bg-warm: #FFCF8A;   /* soft mid blend */
+  --color-bg-deep: #F7F4F3;   /* gradient end (white side) */
 
-  /* Surfaces layered on the background (warm-white tints). */
-  --color-surface: rgba(247, 244, 243, 0.05);
-  --color-surface-raised: rgba(247, 244, 243, 0.08);
-  --color-surface-pressed: rgba(247, 244, 243, 0.13);
-  --color-surface-overlay: rgba(16, 13, 9, 0.72);    /* glass nav / sheets */
-  --color-scrim: rgba(0, 0, 0, 0.55);                /* behind modals */
+  /* -- Color: liquid-glass surfaces --
+     Translucent white over the gradient; pair with --blur-glass
+     and --shadow-glass (inner shine) for the iOS glass recipe. */
+  --color-surface: rgba(255, 255, 255, 0.45);
+  --color-surface-raised: rgba(255, 255, 255, 0.62);
+  --color-surface-pressed: rgba(255, 255, 255, 0.8);
+  --color-surface-overlay: rgba(255, 255, 255, 0.7);  /* nav / sheets / palette */
+  --color-scrim: rgba(46, 27, 4, 0.35);               /* behind modals */
 
-  /* Inverse card: light glass card on dark surfaces
-     (recommendation cards). */
-  --color-surface-inverse: rgba(247, 244, 243, 0.92);
-  --color-text-on-inverse: #020300;
-  --color-text-muted-on-inverse: #6E635B;
-  --color-border-on-inverse: rgba(2, 3, 0, 0.06);
+  /* Inverse card: dark glass on the light gradient. */
+  --color-surface-inverse: rgba(2, 3, 0, 0.88);
+  --color-text-on-inverse: #F7F4F3;
+  --color-text-muted-on-inverse: rgba(247, 244, 243, 0.6);
+  --color-border-on-inverse: rgba(247, 244, 243, 0.14);
 
-  /* -- Color: borders -- */
-  --color-border: rgba(247, 244, 243, 0.09);
-  --color-border-strong: rgba(247, 244, 243, 0.13);
-  --color-border-focus: rgba(255, 164, 0, 0.5);
+  /* -- Color: borders (subtle dark edge; shine comes from
+        --shadow-glass, not the border) -- */
+  --color-border: rgba(2, 3, 0, 0.07);
+  --color-border-strong: rgba(2, 3, 0, 0.12);
+  --color-border-focus: rgba(160, 62, 0, 0.65);
 
   /* -- Color: text --
-     Measured contrast on --color-bg-base:
-     primary 18.9:1, secondary 9.7:1, tertiary 4.7:1 (AA body),
-     muted 2.2:1 - decorative or placeholder use only, never for
-     essential information. */
-  --color-text-primary: #F7F4F3;
-  --color-text-secondary: rgba(247, 244, 243, 0.72);
-  --color-text-tertiary: rgba(247, 244, 243, 0.5);
-  --color-text-muted: rgba(247, 244, 243, 0.28);
+     Measured contrast on the white side (#F7F4F3):
+     primary 18.9:1, secondary 8.6:1, tertiary 4.6:1 (AA body),
+     muted 2.3:1 - decorative or placeholder use only. */
+  --color-text-primary: #020300;
+  --color-text-secondary: rgba(2, 3, 0, 0.72);
+  --color-text-tertiary: rgba(2, 3, 0, 0.55);
+  --color-text-muted: rgba(2, 3, 0, 0.34);
 
   /* -- Color: accent (brand amber) --
-     Amber on --color-on-accent: 10.4:1. Never place white text on
-     accent; always use --color-on-accent. As TEXT the amber passes
-     on dark (10.4:1) but fails on light surfaces - use
-     --color-accent-text for accent-colored text. */
+     Amber is fill-first. As text on light surfaces it fails
+     (1.8:1): use --color-accent-text (#A03E00, 6.0:1). */
   --color-accent: #FFA400;
   --color-on-accent: #020300;
-  --color-accent-text: #FFA400;
-  --color-accent-soft: rgba(255, 164, 0, 0.15);
-  --color-accent-glow: rgba(255, 164, 0, 0.32);
+  --color-accent-text: #A03E00;
+  --color-accent-soft: rgba(255, 164, 0, 0.18);
+  --color-accent-glow: rgba(255, 164, 0, 0.4);
 
   /* -- Color: semantic status (brand rust family) --
-     #772F1A is fill/border only on dark (2.2:1 as text);
-     danger text uses the derived tint #D97B54 (6.8:1). */
-  --color-danger: #772F1A;                            /* warnings, anomalies */
-  --color-danger-soft: rgba(119, 47, 26, 0.2);
-  --color-danger-border: rgba(119, 47, 26, 0.55);
-  --color-danger-text: #D97B54;                       /* danger text on dark */
-  --color-positive: var(--color-accent);              /* gains, progress */
-  --color-neutral-status: var(--color-text-tertiary); /* pending, inactive */
+     #772F1A reads 8.7:1 on the white side - valid as text here. */
+  --color-danger: #772F1A;
+  --color-danger-soft: rgba(119, 47, 26, 0.1);
+  --color-danger-border: rgba(119, 47, 26, 0.35);
+  --color-danger-text: #772F1A;
+  --color-positive: var(--color-accent-text);
+  --color-neutral-status: var(--color-text-tertiary);
 
-  /* -- Typography --
-     Display: Clash Display (headlines, numbers that matter).
-     Body: Satoshi (everything else).
-     Font files pending license verification; reference by name. */
+  /* -- Typography -- */
   --font-display: "Clash Display", "Satoshi", -apple-system, system-ui, sans-serif;
   --font-body: "Satoshi", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-  --text-caption: 0.6875rem;      /* 11px  - timestamps, badges */
-  --text-body-sm: 0.78125rem;     /* 12.5px - metadata, secondary rows */
-  --text-body: 0.84375rem;        /* 13.5px - default reading size */
-  --text-body-lg: 0.875rem;       /* 14px  - inputs, chat user text */
-  --text-title-sm: 1.0625rem;     /* 17px  - card titles */
-  --text-title: 1.3125rem;        /* 21px  - sheet titles */
-  --text-headline: 1.75rem;       /* 28px  - page titles */
-  --text-display-sm: 2.125rem;    /* 34px  - onboarding statements */
-  --text-display: 2.375rem;       /* 38px  - greeting, hero numbers */
+  --text-caption: 0.6875rem;
+  --text-body-sm: 0.78125rem;
+  --text-body: 0.84375rem;
+  --text-body-lg: 0.875rem;
+  --text-title-sm: 1.0625rem;
+  --text-title: 1.3125rem;
+  --text-headline: 1.75rem;
+  --text-display-sm: 2.125rem;
+  --text-display: 2.375rem;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  --line-height-tight: 1.08;      /* display */
-  --line-height-snug: 1.3;        /* titles */
-  --line-height-body: 1.55;       /* reading text */
+  --line-height-tight: 1.08;
+  --line-height-snug: 1.3;
+  --line-height-body: 1.55;
 
   --letter-spacing-display: -0.02em;
   --letter-spacing-title: -0.01em;
-  --letter-spacing-caps: 0.07em;  /* uppercase labels and badges */
+  --letter-spacing-caps: 0.07em;
 
-  /* -- Spacing (4px grid; space-0 for hairline offsets) -- */
-  --space-0: 0.125rem;   /*  2px */
-  --space-1: 0.25rem;    /*  4px */
-  --space-2: 0.5rem;     /*  8px */
-  --space-3: 0.75rem;    /* 12px */
-  --space-4: 1rem;       /* 16px */
-  --space-5: 1.25rem;    /* 20px */
-  --space-6: 1.5rem;     /* 24px */
-  --space-7: 2rem;       /* 32px */
-  --space-8: 2.5rem;     /* 40px */
-  --space-9: 3rem;       /* 48px */
-  --space-10: 4rem;      /* 64px */
+  /* -- Spacing (4px grid) -- */
+  --space-0: 0.125rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 2rem;
+  --space-8: 2.5rem;
+  --space-9: 3rem;
+  --space-10: 4rem;
 
   /* -- Radius -- */
-  --radius-xs: 0.5rem;     /*  8px - avatars, small chips */
-  --radius-sm: 0.625rem;   /* 10px - inline buttons */
-  --radius-md: 0.875rem;   /* 14px - inputs, fields */
-  --radius-lg: 1rem;       /* 16px - suggestion chips, list cards */
-  --radius-xl: 1.25rem;    /* 20px - message bubbles */
-  --radius-2xl: 1.375rem;  /* 22px - content cards */
-  --radius-3xl: 1.625rem;  /* 26px - sheets, device-level panels */
-  --radius-pill: 9999px;   /* pills, nav, input bar */
-  --radius-bubble-tail: 0.25rem; /* 4px - speech bubble anchor corner */
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.375rem;
+  --radius-3xl: 1.625rem;
+  --radius-pill: 9999px;
+  --radius-bubble-tail: 0.25rem;
 
-  /* -- Elevation -- */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 3px 10px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.32);
-  --shadow-nav: 0 12px 32px rgba(0, 0, 0, 0.45);
+  /* -- Elevation (warm, soft; glass shine included) -- */
+  --shadow-sm: 0 1px 3px rgba(90, 50, 0, 0.06), 0 3px 10px rgba(90, 50, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(90, 50, 0, 0.14);
+  --shadow-lg: 0 20px 40px rgba(90, 50, 0, 0.18);
+  --shadow-nav: 0 12px 32px rgba(90, 50, 0, 0.18);
   --shadow-accent: 0 4px 14px var(--color-accent-glow);
-  --shadow-inverse-shine: inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
+  --shadow-inverse-shine: inset 0 1.5px 0 rgba(255, 255, 255, 0.35);
+  /* iOS liquid-glass recipe: top-left shine + soft under-glow.
+     Pair with backdrop blur + saturation. */
+  --shadow-glass:
+    inset 1.5px 1.5px 1px rgba(255, 255, 255, 0.85),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.4),
+    0 8px 24px rgba(90, 50, 0, 0.12);
 
   /* -- Blur (pair with saturation for glass surfaces) -- */
-  --blur-glass: 12px;    --saturate-glass: 180%;   /* pills, keyboards */
-  --blur-nav: 18px;      --saturate-nav: 160%;     /* bottom nav */
-  --blur-card: 24px;     --saturate-card: 140%;    /* inverse cards */
-  --blur-scrim: 4px;                               /* modal backdrop */
+  --blur-glass: 12px;    --saturate-glass: 180%;
+  --blur-nav: 18px;      --saturate-nav: 160%;
+  --blur-card: 24px;     --saturate-card: 140%;
+  --blur-scrim: 4px;
 
-  /* -- Motion --
-     Standard easing is the NOVUS signature curve: fast start,
-     soft landing. Respect prefers-reduced-motion (rule below). */
-  --duration-instant: 100ms;   /* press feedback */
-  --duration-fast: 150ms;      /* hover, small state */
-  --duration-base: 200ms;      /* default transitions */
-  --duration-gentle: 300ms;    /* content entrance */
-  --duration-slow: 500ms;      /* greetings, celebration */
+  /* -- Motion -- */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-gentle: 300ms;
+  --duration-slow: 500ms;
   --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
@@ -158,7 +156,7 @@
   --opacity-disabled: 0.35;
   --opacity-dimmed: 0.55;
 
-  /* -- Z-index scale -- */
+  /* -- Z-index -- */
   --z-base: 0;
   --z-raised: 10;
   --z-sticky: 20;
@@ -168,76 +166,68 @@
   --z-toast: 100;
 
   /* -- Sizing -- */
-  --size-touch-target: 2.75rem;  /* 44px minimum interactive size */
-  --size-input-bar: 3.375rem;    /* 54px chat input bar */
-  --size-icon-sm: 1rem;          /* 16px */
-  --size-icon-md: 1.0625rem;     /* 17px */
-  --size-avatar-sm: 1.625rem;    /* 26px chat avatar */
+  --size-touch-target: 2.75rem;
+  --size-input-bar: 3.375rem;
+  --size-icon-sm: 1rem;
+  --size-icon-md: 1.0625rem;
+  --size-avatar-sm: 1.625rem;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   Dark theme (preserved; opt-in via data-theme="dark")
+   ============================================================ */
+[data-theme="dark"] {
+  --color-bg-base: #020300;
+  --color-bg-warm: #0A0805;
+  --color-bg-deep: #14100A;
+
+  --color-surface: rgba(247, 244, 243, 0.05);
+  --color-surface-raised: rgba(247, 244, 243, 0.08);
+  --color-surface-pressed: rgba(247, 244, 243, 0.13);
+  --color-surface-overlay: rgba(16, 13, 9, 0.72);
+  --color-scrim: rgba(0, 0, 0, 0.55);
+
+  --color-surface-inverse: rgba(247, 244, 243, 0.92);
+  --color-text-on-inverse: #020300;
+  --color-text-muted-on-inverse: #6E635B;
+  --color-border-on-inverse: rgba(2, 3, 0, 0.06);
+
+  --color-border: rgba(247, 244, 243, 0.09);
+  --color-border-strong: rgba(247, 244, 243, 0.13);
+  --color-border-focus: rgba(255, 164, 0, 0.5);
+
+  /* primary 18.9:1, secondary 9.7:1, tertiary 4.7:1, muted deco. */
+  --color-text-primary: #F7F4F3;
+  --color-text-secondary: rgba(247, 244, 243, 0.72);
+  --color-text-tertiary: rgba(247, 244, 243, 0.5);
+  --color-text-muted: rgba(247, 244, 243, 0.28);
+
+  --color-accent-text: #FFA400;
+  --color-accent-soft: rgba(255, 164, 0, 0.15);
+  --color-accent-glow: rgba(255, 164, 0, 0.32);
+
+  --color-danger-soft: rgba(119, 47, 26, 0.2);
+  --color-danger-border: rgba(119, 47, 26, 0.55);
+  --color-danger-text: #D97B54;
+  --color-positive: var(--color-accent);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07), 0 3px 10px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.32);
+  --shadow-nav: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-inverse-shine: inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
+  --shadow-glass:
+    inset 1.5px 1.5px 1px rgba(255, 255, 255, 0.12),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.35);
 
   color-scheme: dark;
 }
 
 /* ============================================================
-   Light scheme
-   Applies when the host sets data-theme="light", or by system
-   preference when data-theme is absent (see media query below).
-   ============================================================ */
-[data-theme="light"] {
-  --color-bg-base: #F7F4F3;
-  --color-bg-warm: #F1EDEA;
-  --color-bg-deep: #EAE4DF;
-
-  --color-surface: rgba(2, 3, 0, 0.04);
-  --color-surface-raised: rgba(2, 3, 0, 0.07);
-  --color-surface-pressed: rgba(2, 3, 0, 0.11);
-  --color-surface-overlay: rgba(247, 244, 243, 0.78);
-  --color-scrim: rgba(2, 3, 0, 0.4);
-
-  --color-surface-inverse: rgba(2, 3, 0, 0.92);
-  --color-text-on-inverse: #F7F4F3;
-  --color-text-muted-on-inverse: rgba(247, 244, 243, 0.6);
-  --color-border-on-inverse: rgba(247, 244, 243, 0.12);
-
-  --color-border: rgba(2, 3, 0, 0.08);
-  --color-border-strong: rgba(2, 3, 0, 0.14);
-
-  /* Measured contrast on #F7F4F3: primary 18.9:1, secondary 8.6:1,
-     tertiary 4.6:1 (AA body), muted decorative only. */
-  --color-text-primary: #020300;
-  --color-text-secondary: rgba(2, 3, 0, 0.72);
-  --color-text-tertiary: rgba(2, 3, 0, 0.55);
-  --color-text-muted: rgba(2, 3, 0, 0.34);
-
-  /* Amber as text fails on light (1.8:1) - accent text darkens
-     to #A03E00 (6.0:1); amber fills keep --color-on-accent. */
-  --color-accent-text: #A03E00;
-  --color-accent-soft: rgba(179, 71, 0, 0.12);
-  --color-danger-soft: rgba(119, 47, 26, 0.08);
-  --color-danger-border: rgba(119, 47, 26, 0.35);
-  --color-danger-text: #772F1A;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 3px 10px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.14);
-  --shadow-nav: 0 12px 32px rgba(0, 0, 0, 0.16);
-
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    /* Hosts that do not manage theming inherit system preference.
-       Values must mirror [data-theme="light"] above. Until a
-       preprocessor exists (post runtime ADR), hosts that support
-       theming should set data-theme explicitly. */
-    color-scheme: light;
-  }
-}
-
-/* ============================================================
    Reduced motion
-   Motion tokens collapse to near-zero; state changes remain
-   perceivable through non-motion cues (color, opacity).
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   :root {

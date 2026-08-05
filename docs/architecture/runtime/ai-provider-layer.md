@@ -111,6 +111,6 @@ Runtime Orchestrator
 ## Non-Goals
 
 - No provider SDK is installed here.
-- No provider adapter is implemented here.
+- Provider adapter for NVIDIA NIM is implemented in `services/ai/providers/nim.ts`.
 - No API key or model ID is committed here.
 

@@ -1,9 +1,16 @@
-import type { DashboardSnapshot } from "./types";
+import type { DashboardSnapshot, AgendaItem } from "./types";
 
 /** Local, deterministic snapshot provider.
     INTEGRATION SEAM: replace the body with the real data layer
     (Supabase + runtime engines) keeping the same signature. */
 export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
+  const agenda: AgendaItem[] = [
+    { id: "a1", kind: "reunion", title: "Llamada con Atropos Labs - propuesta", timeLabel: "10:00", href: "/calendario" },
+    { id: "a2", kind: "pago", title: "Factura SIGBE vencida - $800", timeLabel: "vencido", href: "/negocio" },
+    { id: "a3", kind: "recordatorio", title: "Enviar reporte semanal a Moira", timeLabel: "15:00" },
+    { id: "a4", kind: "compromiso", title: "Cena familiar", timeLabel: "20:30" },
+  ];
+
   return {
     userName: "Rafnell",
     focus: "Cerrar la propuesta de Atropos y mantener Compras bajo control",
@@ -31,6 +38,7 @@ export async function getDashboardSnapshot(): Promise<DashboardSnapshot> {
         },
       ],
     },
+    agenda,
     priorities: [
       { id: "p1", title: "Enviar propuesta a Atropos Labs", priority: "alta", done: false, estimatedMinutes: 45, aiSuggested: false },
       { id: "p2", title: "Recordatorio de cobro a SIGBE", priority: "alta", done: false, estimatedMinutes: 10, aiSuggested: true },

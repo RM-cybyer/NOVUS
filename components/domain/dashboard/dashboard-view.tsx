@@ -5,6 +5,7 @@ import type { DashboardSnapshot } from "@/lib/dashboard/types";
 import { GreetingHeader, AiBriefingCard } from "./briefing";
 import { PrioritiesCard, GoalsCard } from "./planning";
 import { FinanceOverviewCard } from "./finance";
+import { AgendaCard } from "./agenda";
 import { QuickActions } from "./quick-actions";
 import { Skeleton } from "@/components/primitives/skeleton";
 
@@ -31,6 +32,7 @@ export function DashboardView({ data }: { data: DashboardSnapshot }) {
       <div className="grid grid-cols-1 items-start gap-4 md:gap-5 lg:grid-cols-[3fr_2fr]">
         <div className="flex min-w-0 flex-col gap-4 md:gap-5">
           <PrioritiesCard tasks={data.priorities} delay={0.12} />
+          <AgendaCard items={data.agenda} delay={0.15} />
           <FinanceOverviewCard finance={data.finance} delay={0.18} />
           <BusinessCard business={data.business} delay={0.24} />
         </div>

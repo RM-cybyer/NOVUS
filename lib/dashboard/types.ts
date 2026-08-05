@@ -82,11 +82,23 @@ export interface DashboardNotification {
   timeLabel: string;
 }
 
+export type AgendaItemKind = "evento" | "pago" | "recordatorio" | "reunion" | "compromiso";
+
+export interface AgendaItem {
+  id: string;
+  kind: AgendaItemKind;
+  title: string;
+  timeLabel: string;
+  location?: string;
+  href?: string;
+}
+
 export interface DashboardSnapshot {
   userName: string;
   focus: string;
   briefing: Briefing;
   priorities: PriorityTask[];
+  agenda: AgendaItem[];
   finance: FinanceOverview;
   goals: GoalSummary[];
   business: BusinessSummary;
