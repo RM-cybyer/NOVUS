@@ -25,9 +25,19 @@ Before changing files, read:
 
 ## Current Verification
 
-There is no install, build or test command yet. For now, verify repository health by checking:
+Every change must pass the three gates before it lands. CI runs the same
+three on every push and pull request:
 
-- Required folders exist.
-- Each owned folder has a README.
-- Templates are present.
-- GitHub repository health workflow is valid YAML.
+```bash
+pnpm run typecheck
+pnpm run lint
+pnpm run build
+```
+
+A green build is not sufficient on its own: run the affected surface with
+`pnpm dev` and confirm the behaviour you changed.
+
+## AI Agents
+
+Agents working in this repository must read `AGENTS.md` before touching a
+file, and work from a specification in `.ai/tasks/`.
