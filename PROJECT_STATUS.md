@@ -1,17 +1,21 @@
-# Project Status — NOVUS Release 1
+# Project Status — NOVUS MVP
 
-Last updated: 2026-08-05, after the cleanup pass.
+Last updated: 2026-08-05, after the chat went live against a real model.
+
+Scope of record: `blueprints/mvp-scope.md`.
 
 ## Summary
 
 The design system, foundation UI, routing and the Mission Control
-dashboard are built and working. The AI Provider Layer and the chat UI are
-written but have never executed a single live request, because the
-application has no server side: there are no API routes, no persistence
-and no authentication.
+dashboard are built. The chat is live: it reasons over the user's context
+against NVIDIA Nemotron and streams back through a server route.
+
+Everything it reasons over is demo data. There is no database, no
+authentication and no persistence, so nothing the user does survives a
+page reload. Of the fourteen MVP modules, two are materially underway.
 
 The gates are green (`pnpm run typecheck`, `pnpm run lint`,
-`pnpm run build`) and CI now enforces them.
+`pnpm run build`) and CI enforces them.
 
 ## What works
 
@@ -69,21 +73,64 @@ Chat was 77 kB / 227 kB before the AI layer moved to the server. What
 remains in the client bundle is react-markdown, remark-gfm and
 framer-motion.
 
-## MVP critical path
+## MVP progress
 
-Target: sign in, talk to Novus with real data in context, see it on the
-dashboard, and have it persist.
+Measured against `blueprints/mvp-scope.md`, the founder-issued scope.
 
-1. ~~Server route for chat~~ — done 2026-08-05.
-2. Supabase — schema for users, sessions, messages, goals, transactions,
-   events and memories, with RLS. Replace `demo-data.ts` with queries.
-3. Authentication — Supabase Auth; a single user is enough for the MVP.
-4. Deploy to Vercel with `NOVUS_AI_NIM_API_KEY` as a server secret.
-5. Tests — routing engine, registry, chat route.
+| Module | Status |
+|---|---|
+| Authentication | Not started |
+| Dashboard | UI complete, on demo data. Missing active projects and recent conversations |
+| Chat | Conversations, streaming, markdown and code rendering work. Missing history, attachments, search, persistent context |
+| Memory Engine | Not started |
+| Projects | Not started — no route, no contracts |
+| Goals | Scaffold route only |
+| Financial Hub | Scaffold route only |
+| Knowledge Base | Not started |
+| AI Router | Engine works. Providers do not match the scope — see open decisions |
+| Decision Engine | Not started. The chat parses decision cards, but nothing produces them |
+| Settings | Scaffold route only |
+| Backend | Only `app/api/chat` |
+| Database | Not started |
+| Infrastructure | GitHub only. No Vercel, Cloudflare, PostgreSQL, Supabase or Redis |
 
-The scaffold routes can stay scaffolds for the MVP. A chat that genuinely
-knows the user's finances plus a dashboard with real, persistent data is a
-product; nine screens of invented data is not.
+Roughly two of fourteen modules are materially underway. Everything else
+blocks on the database and authentication.
+
+## Open decisions
+
+These conflicts between the built system and the MVP scope need a founder
+call before the work continues.
+
+1. **AI Router providers.** The scope lists OpenAI, Anthropic, Gemini,
+   Perplexity and DeepSeek. The running chat uses NVIDIA NIM, which the
+   scope does not list, and the registry has no Perplexity or DeepSeek
+   entries. Either NVIDIA joins the scope or it is a temporary provider to
+   be replaced.
+2. **Business.** `/negocio` and the dashboard's business card are built,
+   but the scope places Business OS in the future roadmap. Dashboard
+   "active projects" may be what replaces it.
+3. **Connections.** `/conexiones` advertises integrations that the scope
+   defers entirely.
+
+## Suggested build order
+
+Everything below is sequenced by dependency, not by preference.
+
+1. **Database and infrastructure** — Supabase/PostgreSQL with the schema
+   from the scope. Every remaining module blocks on this.
+2. **Authentication** — user identity, which the schema needs first.
+3. **Chat persistence** — history, search and persistent context turn the
+   existing chat into the scoped one.
+4. **Memory Engine** — the core component, and the dashboard and Decision
+   Engine both read from it.
+5. **Projects and Goals** — CRUD that the dashboard is specified to show.
+6. **Dashboard on real data** — replace `lib/dashboard/demo-data.ts`.
+7. **Financial Hub**, then **Decision Engine** (it needs the data above),
+   then **Knowledge Base** and **Settings**.
+
+AI Router provider expansion is independent and can land at any point once
+decision 1 is settled.
 
 ## Technical debt
 
