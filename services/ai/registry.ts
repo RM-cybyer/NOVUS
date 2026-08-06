@@ -57,29 +57,36 @@ export const models: ModelRecord[] = [
   {
     alias: "nova-reasoning",
     providerId: "nim",
-    providerModelId: "nvidia/llama-3.3-nemotron-super-49b-v1",
-    displayName: "Nova Reasoning (NVIDIA NIM)",
-    capabilities: ["reasoning", "long-context", "tool-orchestration", "domain-analysis"],
+    providerModelId: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    displayName: "Nova Reasoning (NVIDIA Nemotron 3 Nano Omni)",
+    // Tool calling is not claimed: it has not been verified against this
+    // model, and claiming it would let the router pick it for tool work.
+    capabilities: ["reasoning", "long-context", "domain-analysis"],
     capabilityDetail: {
       reasoning: true,
       fast: false,
       longContext: true,
       structuredOutput: true,
-      toolCalling: true,
+      toolCalling: false,
       embeddings: false,
       code: false,
       streaming: true,
     },
     contextWindow: "long",
+    // Assumed, not published in NVIDIA's /v1/models response. Only used to
+    // reject oversized prompts, and chat prompts sit far below it.
     contextWindowTokens: 128_000,
     latencyCategory: "medium",
     costCategory: "low",
     fallbackEligible: true,
     deprecated: false,
     maxSensitivity: "sensitive",
-    safetyNotes: ["Suitable for multi-step trade-off analysis.", "Requires structured-output validation for financial decisions."],
-    costPerMillionInput: 0.3,
-    costPerMillionOutput: 0.5,
+    safetyNotes: [
+      "Emits a separate reasoning trace; never surface it as the answer.",
+      "Requires structured-output validation for financial decisions.",
+    ],
+    // Pricing intentionally omitted: unknown for this endpoint, and a
+    // guessed rate would produce fabricated cost figures in the UI.
   },
   {
     alias: "nova-fast",

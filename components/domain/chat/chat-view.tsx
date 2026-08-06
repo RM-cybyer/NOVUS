@@ -3,10 +3,14 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
-import type { ChatMessage, DecisionCard, SuggestedAction } from "@/lib/chat/types";
-import type { ModelRequest } from "@/services/ai/types";
-import { loadAIConfig, buildProviderConfig } from "@/lib/ai/config";
-import { AIService } from "@/services/ai";
+import type {
+  ChatMessage,
+  ChatMessageMetadata,
+  DecisionCard,
+  SuggestedAction,
+} from "@/lib/chat/types";
+import type { ChatTurn } from "@/lib/chat/prompt";
+import { streamChat } from "@/lib/chat/client";
 import { ChatMessageBubble } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 import { ScrollArea } from "@/components/primitives/scroll-area";
@@ -82,22 +86,36 @@ function SuggestedActionsList({ actions, onSelect }: { actions: SuggestedAction[
   );
 }
 
+/** Patch the streaming assistant message in place, appending it on the
+    first delta. */
+function upsertAssistant(
+  messages: ChatMessage[],
+  id: string,
+  patch: Partial<ChatMessage> & { content: string },
+): ChatMessage[] {
+  const idx = messages.findIndex((m) => m.id === id);
+  if (idx === -1) {
+    return [...messages, { id, role: "assistant", timestamp: Date.now(), ...patch }];
+  }
+  const current = messages[idx];
+  if (!current) return messages;
+  const next = [...messages];
+  next[idx] = { ...current, ...patch };
+  return next;
+}
+
 export function ChatView() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isReasoning, setIsReasoning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const reduce = useReducedMotion() ?? false;
 
-  const aiService = useRef<AIService | null>(null);
-
-  useEffect(() => {
-    const env = typeof window !== "undefined" ? (window as { __ENV__?: Record<string, string | undefined> }).__ENV__ : undefined;
-    const config = loadAIConfig(env);
-    const providerConfig = buildProviderConfig("nim", config);
-    aiService.current = new AIService({ providerConfig: { nim: providerConfig } });
-  }, []);
+  // Abort an in-flight response if the view unmounts mid-stream.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
@@ -105,167 +123,84 @@ export function ChatView() {
 
   const handleSend = useCallback(
     async (text: string) => {
-      if (!aiService.current) return;
+      // Built from the state we can read now: setMessages has not flushed,
+      // so the new turn is appended explicitly.
+      const turns: ChatTurn[] = [
+        ...messages
+          .filter((m): m is ChatMessage & { role: "user" | "assistant" } =>
+            m.role === "user" || m.role === "assistant",
+          )
+          .map((m) => ({ role: m.role, content: m.content })),
+        { role: "user", content: text },
+      ];
 
-      const userMessage: ChatMessage = {
-        id: `msg-${Date.now()}`,
-        role: "user",
-        content: text,
-        timestamp: Date.now(),
-      };
-
-      setMessages((prev) => [...prev, userMessage]);
+      setMessages((prev) => [
+        ...prev,
+        { id: `msg-${Date.now()}`, role: "user", content: text, timestamp: Date.now() },
+      ]);
       setShowSuggestions(false);
       setIsStreaming(true);
       setError(null);
 
-      const assistantMessageId = `msg-${Date.now() + 1}`;
-      let fullContent = "";
-      let finalMetadata: ChatMessage["metadata"];
-      let decisionCards: DecisionCard[] = [];
-      let suggestedActions: SuggestedAction[] = [];
+      const assistantId = `msg-${Date.now() + 1}`;
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      let content = "";
+      let metadata: ChatMessageMetadata | undefined;
+      let streamError: string | null = null;
 
       try {
-        const request: ModelRequest = {
-          modelAlias: "nova-reasoning",
-          messages: [
-            ...messages.slice(-10).map((m) => ({
-              role: m.role,
-              content: m.content,
-            })),
-            { role: "user", content: text },
-          ],
-          systemPrompt:
-            "Eres Novus, el AI Operating System para la vida, finanzas y negocios. Actúas como Chief of Staff, Strategic Advisor, Financial Advisor y Second Brain. Comprendes al usuario profundamente. Analiza antes de responder. Explica el porqué. Conecta información. Genera recomendaciones accionables con decision cards. Nunca respondas solo por responder.",
-          stream: true,
-          sensitivity: "internal",
-          workflowType: "chat",
-        };
-
-        for await (const chunk of aiService.current.stream(request)) {
-          fullContent += chunk.delta;
-          if (chunk.metadata) finalMetadata = chunk.metadata;
-
-          setMessages((prev) => {
-            const idx = prev.findIndex((m) => m.id === assistantMessageId);
-            if (idx === -1) {
-              return [
-                ...prev,
-                {
-                  id: assistantMessageId,
-                  role: "assistant" as const,
-                  content: fullContent,
-                  timestamp: Date.now(),
-                  metadata: finalMetadata
-                    ? {
-                        alias: finalMetadata.alias,
-                        providerId: finalMetadata.providerId,
-                        latencyMs: finalMetadata.latencyMs ?? 0,
-                        tokens: finalMetadata.tokens
-                          ? {
-                              promptTokens: finalMetadata.tokens.promptTokens,
-                              completionTokens: finalMetadata.tokens.completionTokens,
-                              totalTokens: finalMetadata.tokens.totalTokens,
-                            }
-                          : undefined,
-                        costUsd: finalMetadata.costUsd,
-                      }
-                    : undefined,
-                },
-              ];
-            }
-            const next = [...prev];
-            const current = next[idx];
-            if (!current) return next;
-            next[idx] = {
-              id: current.id,
-              role: current.role,
-              content: fullContent,
-              timestamp: current.timestamp,
-              metadata: finalMetadata
-                ? {
-                    alias: finalMetadata.alias,
-                    providerId: finalMetadata.providerId,
-                    latencyMs: finalMetadata.latencyMs ?? 0,
-                    tokens: finalMetadata.tokens
-                      ? {
-                          promptTokens: finalMetadata.tokens.promptTokens,
-                          completionTokens: finalMetadata.tokens.completionTokens,
-                          totalTokens: finalMetadata.tokens.totalTokens,
-                        }
-                      : undefined,
-                    costUsd: finalMetadata.costUsd,
-                  }
-                : undefined,
-              toolCallId: current.toolCallId,
-              toolCalls: current.toolCalls,
-              decisionCards: current.decisionCards,
-              suggestedActions: current.suggestedActions,
-            };
-            return next;
-          });
+        for await (const chunk of streamChat(turns, controller.signal)) {
+          if (chunk.type === "reasoning") {
+            // Only a signal that thinking is underway; the trace itself is
+            // deliberately not rendered.
+            setIsReasoning(true);
+          } else if (chunk.type === "delta") {
+            setIsReasoning(false);
+            content += chunk.delta;
+            setMessages((prev) => upsertAssistant(prev, assistantId, { content }));
+          } else if (chunk.type === "done") {
+            metadata = chunk.metadata;
+          } else {
+            streamError = chunk.error;
+          }
         }
-
-        if (fullContent.includes("DECISION_CARD:")) {
-          decisionCards = parseTaggedBlocks<DecisionCard>(fullContent, "DECISION_CARD");
-          fullContent = fullContent.replace(/DECISION_CARD:.*?---/gs, "");
+      } catch (err) {
+        // An abort is the user leaving, not a failure worth surfacing.
+        if (!(err instanceof DOMException && err.name === "AbortError")) {
+          streamError = err instanceof Error ? err.message : "Error desconocido";
         }
+      }
 
-        if (fullContent.includes("SUGGESTED_ACTION:")) {
-          suggestedActions = parseTaggedBlocks<SuggestedAction>(fullContent, "SUGGESTED_ACTION");
-          fullContent = fullContent.replace(/SUGGESTED_ACTION:.*?---/gs, "");
-        }
+      if (streamError) setError(streamError);
 
-        setMessages((prev) => {
-          const idx = prev.findIndex((m) => m.id === assistantMessageId);
-          if (idx === -1) return prev;
-          const next = [...prev];
-          const current = next[idx];
-          if (!current) return prev;
-          next[idx] = {
-            id: current.id,
-            role: current.role,
-            content: fullContent,
-            timestamp: current.timestamp,
-            metadata: finalMetadata
-              ? {
-                  alias: finalMetadata.alias,
-                  providerId: finalMetadata.providerId,
-                  latencyMs: finalMetadata.latencyMs ?? 0,
-                  tokens: finalMetadata.tokens
-                    ? {
-                        promptTokens: finalMetadata.tokens.promptTokens,
-                        completionTokens: finalMetadata.tokens.completionTokens,
-                        totalTokens: finalMetadata.tokens.totalTokens,
-                      }
-                    : undefined,
-                  costUsd: finalMetadata.costUsd,
-                }
-              : undefined,
-            toolCallId: current.toolCallId,
-            toolCalls: current.toolCalls,
+      const decisionCards = content.includes("DECISION_CARD:")
+        ? parseTaggedBlocks<DecisionCard>(content, "DECISION_CARD")
+        : undefined;
+      const suggestedActions = content.includes("SUGGESTED_ACTION:")
+        ? parseTaggedBlocks<SuggestedAction>(content, "SUGGESTED_ACTION")
+        : undefined;
+
+      const cleaned = content
+        .replace(/DECISION_CARD:.*?---/gs, "")
+        .replace(/SUGGESTED_ACTION:.*?---/gs, "")
+        .trim();
+
+      if (cleaned || metadata) {
+        setMessages((prev) =>
+          upsertAssistant(prev, assistantId, {
+            content: cleaned,
+            metadata,
             decisionCards,
             suggestedActions,
-          };
-          return next;
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido");
-        setMessages((prev) => {
-          const idx = prev.findIndex((m) => m.id === assistantMessageId);
-          if (idx === -1) return prev;
-          const next = [...prev];
-          const current = next[idx];
-          if (!current) return prev;
-          next[idx] = {
-            ...current,
-            content: fullContent + "\n\n⚠️ " + (err instanceof Error ? err.message : "Error"),
-          };
-          return next;
-        });
-      } finally {
-        setIsStreaming(false);
+          }),
+        );
       }
+
+      abortRef.current = null;
+      setIsReasoning(false);
+      setIsStreaming(false);
     },
     [messages],
   );
@@ -305,7 +240,7 @@ export function ChatView() {
               className="flex items-center gap-1.5 rounded-full bg-(--color-accent)/10 px-2.5 py-1 text-[11px] font-medium text-(--color-accent)"
             >
               <Loader2 className="size-3 animate-spin" aria-hidden />
-              Pensando...
+              {isReasoning ? "Razonando..." : "Escribiendo..."}
             </motion.span>
           )}
         </div>
@@ -353,7 +288,11 @@ export function ChatView() {
             />
           ))}
 
-          {isStreaming && <TypingIndicator reduce={reduce} />}
+          {/* Only while thinking: once answer tokens arrive the message
+              itself carries the streaming cursor. */}
+          {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
+            <TypingIndicator reduce={reduce} />
+          )}
 
           {error && (
             <motion.div

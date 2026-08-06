@@ -84,6 +84,9 @@ export const ModelRequestSchema = z.object({
   responseFormat: z
     .enum(["text", "json"])
     .optional(),
+  /** Token allowance a reasoning model may spend thinking before it
+      answers. Ignored by providers that do not reason. */
+  reasoningBudget: z.number().int().positive().optional(),
   sensitivity: SensitivityLevel.default("internal"),
   workflowType: WorkflowType.default("chat"),
   stream: z.boolean().default(false),
@@ -121,6 +124,9 @@ export type ModelResponse = z.infer<typeof ModelResponse>;
 
 export const StreamChunk = z.object({
   delta: z.string(),
+  /** Thinking tokens from a reasoning model. Kept separate from `delta`
+      so the answer never carries the model's scratchpad. */
+  reasoningDelta: z.string().optional(),
   done: z.boolean().default(false),
   usage: TokenUsage.optional(),
   metadata: ExecutionMetadata.optional(),

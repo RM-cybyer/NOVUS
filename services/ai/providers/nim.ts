@@ -13,7 +13,13 @@ import type {
 const NIM_DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1";
 
 interface NimChatChoice {
-  message?: { role?: string; content?: string; tool_calls?: unknown[] };
+  message?: {
+    role?: string;
+    content?: string;
+    /** Reasoning models return their scratchpad here, not in `content`. */
+    reasoning_content?: string;
+    tool_calls?: unknown[];
+  };
   finish_reason?: string;
 }
 
@@ -29,7 +35,7 @@ interface NimChatResponse {
 
 interface NimStreamDelta {
   choices?: Array<{
-    delta?: { content?: string; role?: string };
+    delta?: { content?: string; reasoning_content?: string; role?: string };
     finish_reason?: string;
   }>;
   usage?: {
@@ -208,11 +214,23 @@ export class NimProvider implements AIProvider {
           if (payload === "[DONE]") continue;
           try {
             const chunk = JSON.parse(payload) as NimStreamDelta;
-            const delta = chunk.choices?.[0]?.delta?.content ?? "";
+            // The usage-only frame carries an empty choices array, so read
+            // usage before touching choices[0].
             lastUsage = extractUsage(chunk.usage) ?? lastUsage;
             lastRequestId = chunk.id ?? lastRequestId;
-            if (delta) {
-              yield { delta, done: false, metadata: undefined, usage: undefined };
+
+            const frame = chunk.choices?.[0]?.delta;
+            const delta = frame?.content ?? "";
+            const reasoningDelta = frame?.reasoning_content ?? "";
+
+            if (delta || reasoningDelta) {
+              yield {
+                delta,
+                reasoningDelta: reasoningDelta || undefined,
+                done: false,
+                metadata: undefined,
+                usage: undefined,
+              };
             }
           } catch {
             // skip malformed SSE line
@@ -272,6 +290,14 @@ export class NimProvider implements AIProvider {
       messages: mapMessages(request),
       stream,
     };
+    if (stream) {
+      // Without this the provider streams every chunk with usage: null, so
+      // token counts and cost would be lost on every streamed answer.
+      body.stream_options = { include_usage: true };
+    }
+    if (request.reasoningBudget !== undefined) {
+      body.reasoning_budget = request.reasoningBudget;
+    }
     if (request.temperature !== undefined) body.temperature = request.temperature;
     if (request.maxTokens !== undefined) body.max_tokens = request.maxTokens;
     if (request.topP !== undefined) body.top_p = request.topP;

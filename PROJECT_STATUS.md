@@ -22,10 +22,11 @@ The gates are green (`pnpm run typecheck`, `pnpm run lint`,
   goals, business, memory, notifications, quick actions. Below-the-fold
   sections are code-split.
 
-## What is written but does not work
-
-- **Chat** at `/chat` — the UI is complete (bubbles, markdown, typing
-  indicator, decision cards, suggested actions) but cannot reach a model.
+- **Chat** at `/` — full conversational surface backed by
+  `app/api/chat/route.ts`. The route validates the conversation, injects
+  the dashboard context into the system prompt, runs `AIService`
+  server-side and streams SSE back. Needs `NOVUS_AI_NIM_API_KEY` in the
+  server environment to reach a real model.
 - **AI Provider Layer** — types, registry, capability-based routing,
   normalized errors, NVIDIA NIM adapter with SSE streaming, cost
   estimation, health check, zod-validated env config.
@@ -42,19 +43,15 @@ The gates are green (`pnpm run typecheck`, `pnpm run lint`,
 
 ## Blocking defects
 
-1. **No server side.** `app/api/` does not exist. `ChatView` is a client
-   component that instantiates `AIService` in the browser and calls
-   NVIDIA directly. It reads config from `window.__ENV__`, which nothing
-   defines, so no API key is present and every request would be
-   unauthenticated. Injecting the key client-side is not an option: it
-   would ship the credential to every visitor.
-2. **`ChatService` is not wired.** `lib/chat/service.ts` injects goals,
-   finances, agenda and memory into the system prompt. `ChatView` never
-   calls it and builds its own request with a weaker prompt and no
-   context, so context awareness exists in code but not in the product.
-3. **Streaming has no fallback.** `streamWithFallback` ignores the
+1. **Streaming has no fallback.** `streamWithFallback` ignores the
    fallback chain. `executeWithFallback` retries against the same
    adapter, so cross-provider fallback cannot work.
+2. **Nothing persists.** Reloading the page loses the conversation: the
+   route is stateless and the client holds the history in React state.
+
+Resolved on 2026-08-05: the app had no server side, and the context
+injection existed in code but was never wired to the UI. Both were fixed
+by `app/api/chat/route.ts`.
 
 ## Bundle baseline
 
@@ -62,21 +59,22 @@ Measured at the cleanup commit, for tracking regressions:
 
 | Route | Route size | First load JS |
 |---|---|---|
-| `/chat` | 77 kB | 227 kB |
+| `/` (chat) | 51.8 kB | 202 kB |
 | `/panel` | 7.5 kB | 175 kB |
+| `/api/chat` | 134 B | — |
 | scaffolds | 629 B | 142 kB |
 | shared | — | 102 kB |
 
-`/chat` is the outlier because the AI layer, the registry and zod are
-bundled into the browser. Moving execution to a server route removes them.
+Chat was 77 kB / 227 kB before the AI layer moved to the server. What
+remains in the client bundle is react-markdown, remark-gfm and
+framer-motion.
 
 ## MVP critical path
 
 Target: sign in, talk to Novus with real data in context, see it on the
 dashboard, and have it persist.
 
-1. `app/api/chat/route.ts` — run `AIService` server-side, stream back,
-   remove the client-side import, wire `ChatService`.
+1. ~~Server route for chat~~ — done 2026-08-05.
 2. Supabase — schema for users, sessions, messages, goals, transactions,
    events and memories, with RLS. Replace `demo-data.ts` with queries.
 3. Authentication — Supabase Auth; a single user is enough for the MVP.

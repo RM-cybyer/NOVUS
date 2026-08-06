@@ -108,6 +108,9 @@ export interface MemorySnapshot {
 
 export type ChatStreamChunk =
   | { type: "delta"; delta: string; messageId?: string }
+  /** Thinking tokens from a reasoning model, streamed so the UI can show
+      progress. Never part of the answer shown to the user. */
+  | { type: "reasoning"; delta: string; messageId?: string }
   | { type: "done"; messageId?: string; metadata?: ChatMessageMetadata }
   | { type: "error"; error: string };
 
