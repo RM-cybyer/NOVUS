@@ -30,17 +30,29 @@ same signature. The UI never changes.
 
 `lib/dashboard/demo-data.ts` is the reference implementation of that seam.
 
-## Status
+## Order of work
 
-| Task | Module | Owner | State |
+Do them in this order. The order is by demo value, not by size: the chat
+already reasons about goals and money, so those two modules turn its
+existing answers real.
+
+| Task | Module | State | Contract |
 |---|---|---|---|
-| TASK-01 | Projects | Cursor | Ready |
-| TASK-02 | Goals | Cursor | Contract pending |
-| TASK-03 | Financial Hub | Cursor | Contract pending |
-| TASK-04 | Settings | Cursor | Blocked on authentication |
+| TASK-01 | Goals | **Ready — start here** | `lib/goals/types.ts` |
+| TASK-02 | Financial Hub | Ready after 01 | `lib/finance/types.ts` |
+| TASK-03 | Settings | Blocked on authentication | authored in-task |
+| TASK-04 | Projects | Optional. Cut first if time runs short | `lib/projects/types.ts` |
 
-Claude Code's own work — Supabase project, schema, RLS, auth, chat
-persistence — is tracked in `PROJECT_STATUS.md`, not here.
+Claude Code's own work — Supabase project, schema, RLS, authentication,
+chat persistence, and swapping the local providers for real queries — is
+tracked in `PROJECT_STATUS.md`, not here.
+
+## Before the first task
+
+Read `.ai/tasks/ONBOARDING.md`. It carries the product context, the state
+of the codebase, the styling and accessibility conventions, and the
+verification bar. An agent that skips it will invent conventions that
+already exist.
 
 ## Writing a new task
 

@@ -1,8 +1,8 @@
-# TASK-01 — Projects module (UI and local provider)
+# TASK-04 — Projects module (optional)
 
 **Assigned to:** Cursor
-**Branch:** `task/01-projects-ui`
-**Depends on:** nothing. Start immediately.
+**Branch:** `task/04-projects`
+**Start:** only if there is spare capacity, or as the fallback while TASK-03 is blocked. Cut this before cutting anything else.
 **Read first:** `AGENTS.md`, then this file.
 
 ## Context
